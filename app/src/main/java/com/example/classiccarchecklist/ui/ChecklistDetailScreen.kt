@@ -220,6 +220,14 @@ fun ChecklistDetailScreen(
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                     
+                    // Progress indicator
+                    ChecklistProgressIndicator(
+                        items = checklistItems,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
                     ChecklistItemsView(
                         items = checklistItems,
                         onItemValueChanged = { itemId, value ->

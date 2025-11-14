@@ -68,6 +68,16 @@ class ChecklistRepository(
         itemDao.deleteItem(item.toEntity(checklistId))
     }
     
+    /**
+     * Get completion statistics for a checklist
+     */
+    suspend fun getCompletionStats(checklistId: Long): Pair<Int, Int> {
+        val items = getItemsByChecklistIdSuspend(checklistId)
+        val total = items.size
+        val completed = items.count { it.value != null }
+        return Pair(completed, total)
+    }
+    
     // Helper extension functions for conversion
     private fun ChecklistItem.toDomain(): ChecklistItemDomain {
         val optionsList = try {

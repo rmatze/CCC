@@ -23,8 +23,23 @@ class ChecklistListViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     
+    // Map of checklist ID to (completed, total) pair
+    private val _completionStats = MutableStateFlow<Map<Long, Pair<Int, Int>>>(emptyMap())
+    val completionStats: StateFlow<Map<Long, Pair<Int, Int>>> = _completionStats.asStateFlow()
+    
     init {
         loadChecklists()
+    }
+    
+    private fun loadCompletionStats() {
+        viewModelScope.launch {
+            val statsMap = mutableMapOf<Long, Pair<Int, Int>>()
+            _checklists.value.forEach { checklist ->
+                val stats = repository.getCompletionStats(checklist.id)
+                statsMap[checklist.id] = stats
+            }
+            _completionStats.value = statsMap
+        }
     }
     
     private fun loadChecklists() {
@@ -33,6 +48,8 @@ class ChecklistListViewModel(
             repository.getAllChecklists().collect { list ->
                 _checklists.value = list
                 _isLoading.value = false
+                // Load completion stats when checklists update
+                loadCompletionStats()
             }
         }
     }

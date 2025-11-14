@@ -29,6 +29,7 @@ fun ChecklistListScreen(
 ) {
     val checklists by viewModel.checklists.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val completionStats by viewModel.completionStats.collectAsState()
     
     Scaffold(
         modifier = modifier,
@@ -78,8 +79,10 @@ fun ChecklistListScreen(
                         items = checklists,
                         key = { it.id }
                     ) { checklist ->
+                        val stats = completionStats[checklist.id] ?: Pair(0, 0)
                         ChecklistItemCard(
                             checklist = checklist,
+                            completionStats = stats,
                             onClick = { onChecklistClick(checklist.id) },
                             onDelete = { viewModel.deleteChecklist(checklist) }
                         )
@@ -93,15 +96,26 @@ fun ChecklistListScreen(
 @Composable
 fun ChecklistItemCard(
     checklist: CarChecklist,
+    completionStats: Pair<Int, Int>,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val (completed, total) = completionStats
+    val progress = if (total > 0) completed.toFloat() / total.toFloat() else 0f
+    val isComplete = total > 0 && completed == total
     
     Card(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isComplete) {
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
+        )
     ) {
         Row(
             modifier = Modifier
@@ -112,12 +126,24 @@ fun ChecklistItemCard(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                // Date
-                Text(
-                    text = formatDate(checklist.date),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                // Date and Last Modified
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = formatDate(checklist.date),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (checklist.lastModified != checklist.date) {
+                        Text(
+                            text = "• Updated ${formatDate(checklist.lastModified)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                    }
+                }
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
@@ -145,6 +171,40 @@ fun ChecklistItemCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+                
+                // Completion status
+                if (total > 0) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (isComplete) {
+                            Text(
+                                text = "✓",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Text(
+                            text = "$completed / $total items",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(4.dp),
+                            color = if (isComplete) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                            },
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    }
                 }
             }
             

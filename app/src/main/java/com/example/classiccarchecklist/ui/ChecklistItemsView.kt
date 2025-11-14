@@ -27,13 +27,17 @@ fun ChecklistItemsView(
     
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // Display each section
         ChecklistSection.values().forEach { section ->
             val sectionItems = itemsBySection[section] ?: emptyList()
             if (sectionItems.isNotEmpty()) {
-                SectionHeader(section = section)
+                SectionHeader(
+                    section = section,
+                    items = items,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 
                 sectionItems.forEach { item ->
                     ChecklistItemRow(
@@ -45,7 +49,7 @@ fun ChecklistItemsView(
                 }
                 
                 // Add spacing after section
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -53,24 +57,70 @@ fun ChecklistItemsView(
 
 /**
  * Section header composable following Material Design 3 guidelines
+ * Shows section name and completion status
  */
 @Composable
 fun SectionHeader(
     section: ChecklistSection,
+    items: List<ChecklistItemDomain>,
     modifier: Modifier = Modifier
 ) {
+    val sectionItems = items.filter { it.section == section }
+    val completedCount = sectionItems.count { it.value != null }
+    val totalCount = sectionItems.size
+    val isComplete = totalCount > 0 && completedCount == totalCount
+    
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = if (isComplete) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant
+        },
         tonalElevation = 1.dp
     ) {
-        Text(
-            text = section.displayName,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = section.displayName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = if (isComplete) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            )
+            
+            if (totalCount > 0) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (isComplete) {
+                        Text(
+                            text = "✓",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    Text(
+                        text = "$completedCount/$totalCount",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (isComplete) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -103,7 +153,7 @@ fun ChecklistItemRow(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Question text
