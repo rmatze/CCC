@@ -95,7 +95,7 @@ class ChecklistDetailViewModel(
             try {
                 val updatedItems = _checklistItems.value.map { item ->
                     if (item.id == itemId) {
-                        item.copy(value = value)
+                        item.copy(value = value) // isOptional is preserved automatically
                     } else {
                         item
                     }

@@ -17,8 +17,10 @@ fun ChecklistProgressIndicator(
     items: List<ChecklistItemDomain>,
     modifier: Modifier = Modifier
 ) {
-    val totalItems = items.size
-    val completedItems = items.count { it.value != null }
+    // Exclude optional items from count
+    val countableItems = items.filter { !it.isOptional }
+    val totalItems = countableItems.size
+    val completedItems = countableItems.count { it.value != null }
     val progress = if (totalItems > 0) completedItems.toFloat() / totalItems.toFloat() else 0f
     val percentage = (progress * 100).toInt()
     

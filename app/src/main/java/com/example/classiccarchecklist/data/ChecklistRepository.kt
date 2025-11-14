@@ -70,11 +70,14 @@ class ChecklistRepository(
     
     /**
      * Get completion statistics for a checklist
+     * Excludes optional items from the count
      */
     suspend fun getCompletionStats(checklistId: Long): Pair<Int, Int> {
         val items = getItemsByChecklistIdSuspend(checklistId)
-        val total = items.size
-        val completed = items.count { it.value != null }
+        // Exclude optional items from count
+        val countableItems = items.filter { !it.isOptional }
+        val total = countableItems.size
+        val completed = countableItems.count { it.value != null }
         return Pair(completed, total)
     }
     
@@ -87,13 +90,17 @@ class ChecklistRepository(
             emptyList<String>()
         }
         
+        // Determine if item is optional based on question text
+        val isOptional = question == "Where:" // Optional follow-up questions
+        
         return ChecklistItemDomain(
             id = id,
             section = ChecklistSection.valueOf(section),
             question = question,
             type = ChecklistItemType.valueOf(type),
             options = optionsList,
-            value = value
+            value = value,
+            isOptional = isOptional
         )
     }
     
@@ -119,6 +126,7 @@ data class ChecklistItemDomain(
     val question: String,
     val type: ChecklistItemType,
     val options: List<String> = emptyList(),
-    val value: String? = null
+    val value: String? = null,
+    val isOptional: Boolean = false // If true, excluded from completion count
 )
 

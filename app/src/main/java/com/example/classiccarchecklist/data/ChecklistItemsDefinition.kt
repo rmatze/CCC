@@ -104,7 +104,8 @@ object ChecklistItemsDefinition {
             ChecklistItemDomain(
                 section = ChecklistSection.ENGINE_BAY,
                 question = "Where:",
-                type = ChecklistItemType.TEXT_INPUT
+                type = ChecklistItemType.TEXT_INPUT,
+                isOptional = true // Optional follow-up question
             ),
             ChecklistItemDomain(
                 section = ChecklistSection.ENGINE_BAY,

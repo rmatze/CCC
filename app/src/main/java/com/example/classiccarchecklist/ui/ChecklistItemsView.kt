@@ -66,8 +66,10 @@ fun SectionHeader(
     modifier: Modifier = Modifier
 ) {
     val sectionItems = items.filter { it.section == section }
-    val completedCount = sectionItems.count { it.value != null }
-    val totalCount = sectionItems.size
+    // Exclude optional items from count
+    val countableItems = sectionItems.filter { !it.isOptional }
+    val completedCount = countableItems.count { it.value != null }
+    val totalCount = countableItems.size
     val isComplete = totalCount > 0 && completedCount == totalCount
     
     Surface(
