@@ -49,6 +49,18 @@ fun ChecklistDetailScreen(
         }
     }
     
+    val snackbarHostState = remember { SnackbarHostState() }
+    
+    // Show error snackbar when error occurs
+    LaunchedEffect(error) {
+        error?.let { errorMessage ->
+            snackbarHostState.showSnackbar(
+                message = errorMessage,
+                duration = SnackbarDuration.Long
+            )
+        }
+    }
+    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -101,6 +113,9 @@ fun ChecklistDetailScreen(
                     }
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         when {

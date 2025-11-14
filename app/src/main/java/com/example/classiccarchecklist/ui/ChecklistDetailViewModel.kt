@@ -88,18 +88,27 @@ class ChecklistDetailViewModel(
     
     fun updateItemValue(itemId: Long, value: String?) {
         viewModelScope.launch {
-            val updatedItems = _checklistItems.value.map { item ->
-                if (item.id == itemId) {
-                    item.copy(value = value)
-                } else {
-                    item
+            try {
+                val updatedItems = _checklistItems.value.map { item ->
+                    if (item.id == itemId) {
+                        item.copy(value = value)
+                    } else {
+                        item
+                    }
                 }
-            }
-            _checklistItems.value = updatedItems
-            
-            // Save to database
-            updatedItems.find { it.id == itemId }?.let { updatedItem ->
-                repository.updateItem(updatedItem, checklistId)
+                _checklistItems.value = updatedItems
+                
+                // Save to database immediately (auto-save)
+                updatedItems.find { it.id == itemId }?.let { updatedItem ->
+                    repository.updateItem(updatedItem, checklistId)
+                    // Update lastModified timestamp
+                    _checklist.value?.let { current ->
+                        _checklist.value = current.copy(lastModified = java.util.Date())
+                        repository.updateChecklist(current.copy(lastModified = java.util.Date()))
+                    }
+                }
+            } catch (e: Exception) {
+                _error.value = "Failed to save: ${e.message}"
             }
         }
     }
