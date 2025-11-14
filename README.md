@@ -645,3 +645,131 @@ Phase 6 Summary: Checklist Items - Multi-Choice Questions
 *   All multi-choice items are now fully interactive
 
 *   State persists automatically to database
+
+
+Phase 7 Summary: Checklist Items - Text Input Fields
+----------------------------------------------------
+
+### Completed components
+
+1.  Text input widget component:
+
+
+*   TextInputItemWidget — uses Material Design 3 OutlinedTextField
+
+*   Single-line text input with proper keyboard handling
+
+*   Real-time value updates as user types
+
+*   Saves non-empty values; clears to null when empty
+
+*   Configurable placeholder text
+
+*   Proper keyboard type (text)
+
+
+2.  Visual feedback for completed items:
+
+
+*   Same visual feedback as other item types (card background, elevation, bold text)
+
+*   "✓ Entered" badge appears when text is entered
+
+*   Badge uses primary container color for visibility
+
+*   Card styling changes to indicate completion
+
+
+3.  State management:
+
+
+*   Text value stored as string in database
+
+*   State persists automatically via ViewModel
+
+*   Updates in real time as user types
+
+*   Empty text clears the value (sets to null)
+
+
+4.  Integration:
+
+
+*   ChecklistItemRow updated to use TextInputItemWidget for TEXT\_INPUT type items
+
+*   All text input items now have interactive text fields
+
+
+### Text input items implemented
+
+*   Engine Bay section:
+
+*   "Where:" (for fluid leaks location) — single-line text input
+
+
+### Android best practices implemented
+
+*   Material Design 3 OutlinedTextField component
+
+*   Proper state management with immediate persistence
+
+*   Visual accessibility with clear input indicators
+
+*   Appropriate keyboard type (text)
+
+*   Real-time value updates
+
+*   Color contrast following Material Design guidelines
+
+*   Immediate visual feedback for user actions
+
+
+### Build status
+
+*   Project builds successfully
+
+*   No linting errors
+
+*   All text input items are now interactive
+
+
+### What you can test now
+
+1.  Open any checklist
+
+2.  Navigate to Engine Bay section
+
+3.  Find the "Where:" question (after "Evidence of fluid leaks")
+
+4.  Tap the text field to start typing
+
+5.  Enter text (e.g., "Under engine", "Transmission area")
+
+6.  See visual feedback:
+
+
+*   Text appears in the field
+
+*   Card background changes
+
+*   "✓ Entered" badge appears
+
+*   Question text becomes bold
+
+
+1.  Clear the text — value is removed and badge disappears
+
+2.  Navigate away and back — text persists
+
+
+### Phase 5-7 completion summary
+
+All checklist item types are now fully implemented:
+
+*   YES/NO items: ~45 items with radio buttons
+
+*   Multi-choice items: 4 items with dropdown menus
+
+*   Text input items: 1 item with text field
+
+*   Total: 58 checklist items, all interactive

@@ -145,18 +145,13 @@ fun ChecklistItemRow(
                     }
                 }
                 com.example.classiccarchecklist.data.ChecklistItemType.TEXT_INPUT -> {
-                    // Placeholder for Phase 7
-                    Surface(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = MaterialTheme.shapes.small
-                    ) {
-                        Text(
-                            text = "TEXT INPUT (Phase 7)",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
+                    TextInputItemWidget(
+                        currentValue = item.value,
+                        onValueChanged = onValueChanged,
+                        placeholder = "Enter information",
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
                 }
             }
         }
