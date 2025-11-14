@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -13,10 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.classiccarchecklist.data.ChecklistRepository
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -206,57 +209,85 @@ fun NewChecklistScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialog(
     initialDate: Date,
     onDateSelected: (Date) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val calendar = remember { Calendar.getInstance().apply { time = initialDate } }
-    var selectedYear by remember { mutableStateOf(calendar.get(Calendar.YEAR)) }
-    var selectedMonth by remember { mutableStateOf(calendar.get(Calendar.MONTH)) }
-    var selectedDay by remember { mutableStateOf(calendar.get(Calendar.DAY_OF_MONTH)) }
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialDate.time,
+        yearRange = IntRange(1900, Calendar.getInstance().get(Calendar.YEAR) + 1)
+    )
     
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Select Date") },
-        text = {
-            Column {
-                // Simple date input fields
-                // For a better UX, you could use a proper date picker library
-                // For now, we'll use a simple approach
-                OutlinedTextField(
-                    value = "${selectedMonth + 1}/${selectedDay}/${selectedYear}",
-                    onValueChange = { },
-                    label = { Text("Date (MM/DD/YYYY)") },
-                    readOnly = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Note: Full date picker will be enhanced in future update",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val newCalendar = Calendar.getInstance().apply {
-                        set(selectedYear, selectedMonth, selectedDay)
-                    }
-                    onDateSelected(newCalendar.time)
-                }
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(
+                    text = "Select Date",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
+                
+                DatePicker(
+                    state = datePickerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                // DatePicker returns UTC midnight, extract the date components
+                                // and create a new date in local timezone to avoid day offset
+                                val utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                                    timeInMillis = millis
+                                }
+                                
+                                // Create a new date in local timezone with the same year/month/day
+                                val localCalendar = Calendar.getInstance().apply {
+                                    set(Calendar.YEAR, utcCalendar.get(Calendar.YEAR))
+                                    set(Calendar.MONTH, utcCalendar.get(Calendar.MONTH))
+                                    set(Calendar.DAY_OF_MONTH, utcCalendar.get(Calendar.DAY_OF_MONTH))
+                                    set(Calendar.HOUR_OF_DAY, 12) // Use noon to avoid timezone edge cases
+                                    set(Calendar.MINUTE, 0)
+                                    set(Calendar.SECOND, 0)
+                                    set(Calendar.MILLISECOND, 0)
+                                }
+                                onDateSelected(localCalendar.time)
+                            }
+                        },
+                        enabled = datePickerState.selectedDateMillis != null
+                    ) {
+                        Text("OK")
+                    }
+                }
             }
         }
-    )
+    }
 }
 
 private fun formatDateForDisplay(date: Date): String {
