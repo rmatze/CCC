@@ -146,31 +146,6 @@ fun ChecklistDetailScreen(
                 }
             )
         },
-        bottomBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                tonalElevation = 3.dp,
-                color = MaterialTheme.colorScheme.surface
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "$completedItems / $totalItems items completed",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    if (progressPercent == 100) {
-                        Button(onClick = { /* TODO: complete checklist */ }) {
-                            Text("Complete checklist")
-                        }
-                    }
-                }
-            }
-        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
@@ -330,8 +305,6 @@ fun ChecklistDetailScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
                         )
-                        
-                        Spacer(modifier = Modifier.height(80.dp)) // Space for bottom bar
                     }
                 }
             }
