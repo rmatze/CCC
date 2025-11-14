@@ -58,6 +58,8 @@ fun ChecklistDetailScreen(
                 message = errorMessage,
                 duration = SnackbarDuration.Long
             )
+            // Clear error after showing
+            viewModel.clearError()
         }
     }
     
@@ -198,8 +200,11 @@ fun ChecklistDetailScreen(
                         value = if (isEditing) editedVin else checklist!!.vin,
                         onValueChange = { 
                             if (isEditing) {
-                                editedVin = it
-                                viewModel.updateVin(it)
+                                // Limit VIN to 17 characters (standard VIN length)
+                                if (it.length <= 17) {
+                                    editedVin = it.uppercase()
+                                    viewModel.updateVin(it.uppercase())
+                                }
                             }
                         },
                         label = { Text("VIN Number") },
@@ -207,7 +212,12 @@ fun ChecklistDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        enabled = isEditing
+                        enabled = isEditing,
+                        supportingText = {
+                            if (isEditing && editedVin.isNotEmpty()) {
+                                Text("${editedVin.length}/17 characters")
+                            }
+                        }
                     )
                     
                     // Checklist Items

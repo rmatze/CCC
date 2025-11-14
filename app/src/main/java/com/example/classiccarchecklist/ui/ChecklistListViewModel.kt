@@ -33,12 +33,22 @@ class ChecklistListViewModel(
     
     private fun loadCompletionStats() {
         viewModelScope.launch {
-            val statsMap = mutableMapOf<Long, Pair<Int, Int>>()
-            _checklists.value.forEach { checklist ->
-                val stats = repository.getCompletionStats(checklist.id)
-                statsMap[checklist.id] = stats
+            try {
+                val statsMap = mutableMapOf<Long, Pair<Int, Int>>()
+                _checklists.value.forEach { checklist ->
+                    try {
+                        val stats = repository.getCompletionStats(checklist.id)
+                        statsMap[checklist.id] = stats
+                    } catch (e: Exception) {
+                        // If stats fail to load for one checklist, use default
+                        statsMap[checklist.id] = Pair(0, 0)
+                    }
+                }
+                _completionStats.value = statsMap
+            } catch (e: Exception) {
+                // If stats loading fails completely, use empty map
+                _completionStats.value = emptyMap()
             }
-            _completionStats.value = statsMap
         }
     }
     

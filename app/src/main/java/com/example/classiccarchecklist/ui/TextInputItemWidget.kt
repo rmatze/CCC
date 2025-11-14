@@ -37,9 +37,11 @@ fun TextInputItemWidget(
         OutlinedTextField(
             value = textValue,
             onValueChange = { newValue ->
-                textValue = newValue
+                // Limit text length to prevent database issues
+                val limitedValue = if (newValue.length > 500) newValue.take(500) else newValue
+                textValue = limitedValue
                 // Save non-empty values, or null if empty
-                onValueChanged(if (newValue.isNotBlank()) newValue else null)
+                onValueChanged(if (limitedValue.isNotBlank()) limitedValue else null)
             },
             placeholder = { Text(placeholder) },
             modifier = Modifier.fillMaxWidth(),

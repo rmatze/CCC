@@ -29,6 +29,10 @@ class ChecklistDetailViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
     
+    fun clearError() {
+        _error.value = null
+    }
+    
     private val _checklistItems = MutableStateFlow<List<ChecklistItemDomain>>(emptyList())
     val checklistItems: StateFlow<List<ChecklistItemDomain>> = _checklistItems.asStateFlow()
     
@@ -103,12 +107,16 @@ class ChecklistDetailViewModel(
                     repository.updateItem(updatedItem, checklistId)
                     // Update lastModified timestamp
                     _checklist.value?.let { current ->
-                        _checklist.value = current.copy(lastModified = java.util.Date())
-                        repository.updateChecklist(current.copy(lastModified = java.util.Date()))
+                        val updatedChecklist = current.copy(lastModified = java.util.Date())
+                        _checklist.value = updatedChecklist
+                        repository.updateChecklist(updatedChecklist)
                     }
                 }
             } catch (e: Exception) {
                 _error.value = "Failed to save: ${e.message}"
+                // Clear error after 5 seconds
+                kotlinx.coroutines.delay(5000)
+                _error.value = null
             }
         }
     }

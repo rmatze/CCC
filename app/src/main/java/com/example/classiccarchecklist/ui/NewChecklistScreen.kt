@@ -158,12 +158,22 @@ fun NewChecklistScreen(
             // VIN field
             OutlinedTextField(
                 value = vin,
-                onValueChange = { viewModel.updateVin(it) },
+                onValueChange = { 
+                    // Limit VIN to 17 characters (standard VIN length)
+                    if (it.length <= 17) {
+                        viewModel.updateVin(it.uppercase())
+                    }
+                },
                 label = { Text("VIN Number") },
                 placeholder = { Text("Enter VIN number") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                supportingText = {
+                    if (vin.isNotEmpty()) {
+                        Text("${vin.length}/17 characters")
+                    }
+                }
             )
             
             // Info text
