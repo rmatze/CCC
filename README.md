@@ -507,3 +507,141 @@ Phase 5 Summary: Checklist Items - YES/NO Questions
 *   All YES/NO items are now fully interactive
 
 *   State persists automatically to database
+
+
+Phase 6 Summary: Checklist Items - Multi-Choice Questions
+---------------------------------------------------------
+
+### Completed components
+
+1.  Multi-choice widget component:
+
+
+*   MultiChoiceItemWidget — uses Material Design 3 ExposedDropdownMenuBox
+
+*   Dropdown menu with all available options
+
+*   "Clear selection" option to deselect
+
+*   Read-only text field showing selected value
+
+*   Dropdown icon indicator
+
+
+2.  Visual feedback for completed items:
+
+
+*   Same visual feedback as YES/NO items (card background, elevation, bold text)
+
+*   "✓ Selected: \[value\]" badge showing the selected option
+
+*   Badge uses primary container color for visibility
+
+
+3.  State management:
+
+
+*   Selected value stored as string (e.g., "STRAIGHT", "POOR", "GOOD")
+
+*   State persists to database automatically via ViewModel
+
+*   Updates in real time as user selects options
+
+
+4.  Integration:
+
+
+*   ChecklistItemRow updated to use MultiChoiceItemWidget for MULTI\_CHOICE type items
+
+*   All multi-choice items now have interactive dropdowns
+
+*   Fallback handling if no options are defined
+
+
+### Multi-choice items implemented
+
+*   Paint & Body:
+
+*   Body lines: STRAIGHT, WAVY, MISSING
+
+*   Rust: SUPERFICIAL, PITTING, HOLES, BLISTERS IN PAINT
+
+*   Tires & Lug Nuts:
+
+*   Tire condition: POOR, FAIR, GOOD
+
+*   Test Drive:
+
+*   Overall drivability: POOR, FAIR, GOOD, GREAT
+
+
+### Android best practices implemented
+
+*   Material Design 3 ExposedDropdownMenuBox component
+
+*   Proper state management with immediate persistence
+
+*   Visual accessibility with clear selection indicators
+
+*   Appropriate touch targets (full-width dropdown menu items)
+
+*   Color contrast following Material Design guidelines
+
+*   Immediate visual feedback for user actions
+
+*   Experimental API properly annotated with @OptIn
+
+
+### Build status
+
+*   Project builds successfully
+
+*   No linting errors
+
+*   All multi-choice items are now interactive
+
+
+### What you can test now
+
+1.  Open any checklist
+
+2.  Find multi-choice questions:
+
+
+*   Paint & Body → "Body lines" (STRAIGHT, WAVY, MISSING)
+
+*   Paint & Body → "Rust" (SUPERFICIAL, PITTING, HOLES, BLISTERS IN PAINT)
+
+*   Tires & Lug Nuts → "Tire condition" (POOR, FAIR, GOOD)
+
+*   Test Drive → "How is overall feel - drivability" (POOR, FAIR, GOOD, GREAT)
+
+
+1.  Tap the dropdown field to open the menu
+
+2.  Select an option from the dropdown
+
+3.  See visual feedback:
+
+
+*   Selected value displayed in the field
+
+*   Card background changes
+
+*   "✓ Selected: \[value\]" badge appears
+
+*   Question text becomes bold
+
+
+1.  Tap "Clear selection" to deselect
+
+2.  Navigate away and back — selections persist
+
+
+### Statistics
+
+*   Total multi-choice items: 4 out of 58 total items
+
+*   All multi-choice items are now fully interactive
+
+*   State persists automatically to database

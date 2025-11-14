@@ -128,23 +128,19 @@ fun ChecklistItemRow(
                     )
                 }
                 com.example.classiccarchecklist.data.ChecklistItemType.MULTI_CHOICE -> {
-                    // Placeholder for Phase 6
-                    Surface(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = MaterialTheme.shapes.small
-                    ) {
-                        Text(
-                            text = "MULTI-CHOICE (Phase 6)",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
                     if (item.options.isNotEmpty()) {
+                        MultiChoiceItemWidget(
+                            options = item.options,
+                            currentValue = item.value,
+                            onValueChanged = onValueChanged,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        // Fallback if no options are defined
                         Text(
-                            text = "Options: ${item.options.joinToString(", ")}",
+                            text = "No options available",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
