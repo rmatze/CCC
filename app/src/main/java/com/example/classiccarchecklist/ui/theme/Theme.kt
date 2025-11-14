@@ -32,10 +32,10 @@ private val DarkColorScheme = darkColorScheme(
     onTertiary = Color.Black,
     
     background = DarkBackground,
-    onBackground = WhiteText,
+    onBackground = OnBackgroundLight,
     
     surface = DarkSurface,
-    onSurface = WhiteText,
+    onSurface = OnBackgroundLight,
     surfaceVariant = DarkSurfaceVariant,
     onSurfaceVariant = WhiteTextSecondary,
     

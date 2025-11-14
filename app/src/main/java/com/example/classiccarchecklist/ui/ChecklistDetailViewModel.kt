@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 
 /**
  * ViewModel for the checklist detail screen
@@ -69,6 +70,12 @@ class ChecklistDetailViewModel(
     fun updateVin(vin: String) {
         _checklist.value?.let { current ->
             _checklist.value = current.copy(vin = vin)
+        }
+    }
+    
+    fun updateDate(date: Date) {
+        _checklist.value?.let { current ->
+            _checklist.value = current.copy(date = date)
         }
     }
     

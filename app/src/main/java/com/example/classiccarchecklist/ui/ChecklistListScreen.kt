@@ -1,18 +1,20 @@
 package com.example.classiccarchecklist.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,23 +43,24 @@ fun ChecklistListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = onAddChecklist,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add new checklist"
-                )
-            }
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "New checklist"
+                    )
+                },
+                text = { Text("New checklist") }
+            )
         }
-    ) { paddingValues ->
+    ) { innerPadding ->
         when {
             isLoading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
+                        .padding(innerPadding),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -66,25 +69,28 @@ fun ChecklistListScreen(
             checklists.isEmpty() -> {
                 EmptyState(
                     onAddChecklist = onAddChecklist,
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
             else -> {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(innerPadding),
+                    contentPadding = PaddingValues(vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(
                         items = checklists,
                         key = { it.id }
                     ) { checklist ->
                         val stats = completionStats[checklist.id] ?: Pair(0, 0)
-                        ChecklistItemCard(
+                        ChecklistCard(
                             checklist = checklist,
                             completionStats = stats,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
                             onClick = { onChecklistClick(checklist.id) },
                             onDelete = { viewModel.deleteChecklist(checklist) }
                         )
@@ -95,165 +101,99 @@ fun ChecklistListScreen(
     }
 }
 
+
 @Composable
-fun ChecklistItemCard(
+fun ChecklistCard(
     checklist: CarChecklist,
     completionStats: Pair<Int, Int>,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    onDelete: () -> Unit
 ) {
-    var showDeleteDialog by remember { mutableStateOf(false) }
     val (completed, total) = completionStats
     val progress = if (total > 0) completed.toFloat() / total.toFloat() else 0f
-    val isComplete = total > 0 && completed == total
+    val progressPercent = if (total > 0) (completed * 100f / total).toInt() else 0
     
     Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isComplete) 4.dp else 2.dp
-        ),
+        modifier = modifier
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        ),
-        shape = MaterialTheme.shapes.medium
+        )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(16.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
+            // Green stripe on far left edge
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+            
+            // Content
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Date and Last Modified
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
+                    // Car name
                     Text(
-                        text = formatDate(checklist.date),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    if (checklist.lastModified != checklist.date) {
-                        Text(
-                            text = "• Updated ${formatDate(checklist.lastModified)}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                        )
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Car Info
-                if (checklist.carInfo.isNotEmpty()) {
-                    Text(
-                        text = checklist.carInfo,
+                        text = checklist.carInfo.ifEmpty { "No car information" },
                         style = MaterialTheme.typography.titleMedium,
-                        maxLines = 2,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                } else {
-                    Text(
-                        text = "No car information",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                
-                // VIN
-                if (checklist.vin.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "VIN: ${checklist.vin}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                
-                // Completion status
-                if (total > 0) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (isComplete) {
-                            Surface(
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.small
-                            ) {
-                                Text(
-                                    text = "✓",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = Color.Black,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
+                    
+                    // VIN
+                    if (checklist.vin.isNotEmpty()) {
                         Text(
-                            text = "$completed / $total items",
+                            text = "VIN: ${checklist.vin}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = if (isComplete) FontWeight.Medium else FontWeight.Normal
-                        )
-                        LinearProgressIndicator(
-                            progress = { progress },
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(6.dp),
-                            color = if (isComplete) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                            },
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                    
+                    // Progress text
+                    Text(
+                        text = "$completed / $total items • $progressPercent% complete",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-            }
-            
-            // Delete button
-            IconButton(
-                onClick = { showDeleteDialog = true },
-                modifier = Modifier.align(Alignment.CenterVertically)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete checklist",
-                    tint = MaterialTheme.colorScheme.error
-                )
+                
+                // Right side: Circular progress with percentage in center
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(64.dp)
+                ) {
+                    CircularProgressIndicator(
+                        progress = { progress },
+                        strokeWidth = 6.dp,
+                        modifier = Modifier.size(64.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                    )
+                    Text(
+                        text = "$progressPercent%",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
-    }
-    
-    // Delete confirmation dialog
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Checklist") },
-            text = {
-                Text("Are you sure you want to delete this checklist? This action cannot be undone.")
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDelete()
-                        showDeleteDialog = false
-                    }
-                ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
     }
 }
 
@@ -272,11 +212,12 @@ fun EmptyState(
             modifier = Modifier.padding(32.dp)
         ) {
             Text(
-                text = "No Checklists Yet",
-                style = MaterialTheme.typography.headlineMedium
+                text = "No checklists yet",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Tap the + button to create your first classic car checklist",
+                text = "Start a new checklist for your next classic car inspection.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -284,13 +225,7 @@ fun EmptyState(
                 onClick = onAddChecklist,
                 modifier = Modifier.padding(top = 8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Create Checklist")
+                Text("Create checklist")
             }
         }
     }
@@ -300,4 +235,3 @@ private fun formatDate(date: Date): String {
     val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
     return formatter.format(date)
 }
-

@@ -3,6 +3,7 @@ package com.example.classiccarchecklist.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -151,26 +152,26 @@ fun ChecklistItemRow(
         MaterialTheme.colorScheme.surface
     }
     
-    Card(
+    ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isCompleted) 3.dp else 1.dp
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = if (isCompleted) 2.dp else 1.dp
         ),
-        colors = CardDefaults.cardColors(
+        colors = CardDefaults.elevatedCardColors(
             containerColor = cardColor
         ),
-        shape = MaterialTheme.shapes.medium
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Question text
             Text(
                 text = item.question,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = if (isCompleted) {
                     androidx.compose.ui.text.font.FontWeight.Medium

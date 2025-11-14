@@ -21,7 +21,6 @@ fun MultiChoiceItemWidget(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val isAnswered = currentValue != null
     val displayValue = currentValue ?: "Select an option"
     
     ExposedDropdownMenuBox(
@@ -69,38 +68,6 @@ fun MultiChoiceItemWidget(
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
-            }
-        }
-    }
-    
-    // Visual indicator for completed items
-    if (isAnswered) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Start,
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-        ) {
-            Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = MaterialTheme.shapes.small
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "✓",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = "Selected: $currentValue",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
             }
         }
     }

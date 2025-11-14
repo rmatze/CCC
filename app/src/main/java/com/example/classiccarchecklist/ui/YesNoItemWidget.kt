@@ -1,6 +1,8 @@
 package com.example.classiccarchecklist.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -9,7 +11,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Widget for YES/NO checklist items
- * Uses radio buttons following Material Design 3 guidelines
+ * Uses FilterChips following Material Design 3 guidelines
  */
 @Composable
 fun YesNoItemWidget(
@@ -19,90 +21,56 @@ fun YesNoItemWidget(
 ) {
     val isYesSelected = currentValue == "YES"
     val isNoSelected = currentValue == "NO"
-    val isAnswered = currentValue != null
     
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // YES option
-        Row(
-            modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            RadioButton(
-                selected = isYesSelected,
-                onClick = {
-                    if (isYesSelected) {
-                        // Allow deselecting by clicking again
-                        onValueChanged(null)
-                    } else {
-                        onValueChanged("YES")
-                    }
-                }
-            )
-            Text(
-                text = "YES",
-                style = MaterialTheme.typography.bodyLarge,
-                color = if (isYesSelected) {
-                    MaterialTheme.colorScheme.primary
+        FilterChip(
+            selected = isYesSelected,
+            onClick = {
+                if (isYesSelected) {
+                    // Allow deselecting by clicking again
+                    onValueChanged(null)
                 } else {
-                    MaterialTheme.colorScheme.onSurface
+                    onValueChanged("YES")
                 }
-            )
-        }
+            },
+            label = { Text("Yes") },
+            leadingIcon = if (isYesSelected) {
+                {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            } else null
+        )
         
         // NO option
-        Row(
-            modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            RadioButton(
-                selected = isNoSelected,
-                onClick = {
-                    if (isNoSelected) {
-                        // Allow deselecting by clicking again
-                        onValueChanged(null)
-                    } else {
-                        onValueChanged("NO")
-                    }
-                }
-            )
-            Text(
-                text = "NO",
-                style = MaterialTheme.typography.bodyLarge,
-                color = if (isNoSelected) {
-                    MaterialTheme.colorScheme.primary
+        FilterChip(
+            selected = isNoSelected,
+            onClick = {
+                if (isNoSelected) {
+                    // Allow deselecting by clicking again
+                    onValueChanged(null)
                 } else {
-                    MaterialTheme.colorScheme.onSurface
+                    onValueChanged("NO")
                 }
-            )
-        }
-    }
-    
-    // Visual indicator for completed items
-    if (isAnswered) {
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = MaterialTheme.shapes.small
-            ) {
-                Text(
-                    text = "✓ Answered",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                )
-            }
-        }
+            },
+            label = { Text("No") },
+            leadingIcon = if (isNoSelected) {
+                {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            } else null
+        )
     }
 }
-
