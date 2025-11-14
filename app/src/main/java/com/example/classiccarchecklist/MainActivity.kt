@@ -43,7 +43,8 @@ class MainActivity : ComponentActivity() {
                     
                     NavGraph(
                         navController = navController,
-                        checklistListViewModel = viewModel
+                        checklistListViewModel = viewModel,
+                        repository = repository
                     )
                 }
             }

@@ -6,6 +6,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.classiccarchecklist.data.ChecklistRepository
+import com.example.classiccarchecklist.ui.ChecklistDetailScreen
 import com.example.classiccarchecklist.ui.ChecklistListScreen
 import com.example.classiccarchecklist.ui.ChecklistListViewModel
 import com.example.classiccarchecklist.ui.NewChecklistScreen
@@ -24,7 +26,8 @@ sealed class Screen(val route: String) {
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    checklistListViewModel: ChecklistListViewModel
+    checklistListViewModel: ChecklistListViewModel,
+    repository: ChecklistRepository
 ) {
     NavHost(
         navController = navController,
@@ -44,7 +47,13 @@ fun NavGraph(
         
         composable(Screen.NewChecklist.route) {
             NewChecklistScreen(
+                repository = repository,
                 onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onSaveComplete = { checklistId ->
+                    // For Phase 3, navigate back to list
+                    // In Phase 4, we'll navigate to the checklist detail screen
                     navController.popBackStack()
                 }
             )
@@ -58,8 +67,9 @@ fun NavGraph(
         ) { backStackEntry ->
             val checklistId = backStackEntry.arguments?.getLong("checklistId")
             if (checklistId != null) {
-                // Placeholder for Phase 4 - will be implemented later
-                NewChecklistScreen(
+                ChecklistDetailScreen(
+                    repository = repository,
+                    checklistId = checklistId,
                     onNavigateBack = {
                         navController.popBackStack()
                     }

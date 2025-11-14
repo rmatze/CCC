@@ -157,3 +157,96 @@ Phase 2 Summary: Main Screen - Car List
 3.  Tap the back button — returns to the main screen
 
 4.  The list will automatically populate when checklists are created (Phase 3)
+
+
+Phase 3 Summary: New Checklist - Header Information
+---------------------------------------------------
+
+### Completed components
+
+1.  ViewModel:
+
+
+*   NewChecklistViewModel — manages state for date, car info, VIN
+
+*   NewChecklistViewModelFactory — factory for ViewModel creation
+
+*   Save functionality with error handling
+
+*   Loading state management
+
+
+2.  New Checklist Screen UI:
+
+
+*   Date field — auto-populated with current date, formatted as "MMMM dd, yyyy"
+
+*   Date picker dialog — basic dialog to change the date (can be enhanced later)
+
+*   Car Information field — multi-line text field (3-5 lines) for open-ended car details
+
+*   VIN field — single-line text input for VIN number
+
+*   Save & Continue button — saves checklist and navigates back to list
+
+*   Cancel button — navigates back without saving
+
+*   Error display — shows error messages if save fails
+
+*   Loading indicator — shows while saving
+
+
+3.  Data persistence:
+
+
+*   Saves checklist to database when "Save & Continue" is clicked
+
+*   Auto-updates lastModified timestamp
+
+*   Returns to checklist list after successful save
+
+*   Checklist appears in the list immediately
+
+
+4.  Navigation:
+
+
+*   Updated NavGraph to pass repository to NewChecklistScreen
+
+*   Handles save completion callback
+
+*   Navigates back to list after save (will navigate to detail screen in Phase 4)
+
+
+### Build status
+
+*   Project builds successfully
+
+*   No linting errors
+
+*   All functionality implemented
+
+
+### What you can test
+
+1.  Tap the FAB (+) button on the main screen
+
+2.  See the new checklist screen with:
+
+
+*   Auto-populated current date
+
+*   Empty car information field
+
+*   Empty VIN field
+
+
+1.  Fill in car information and VIN
+
+2.  Tap "Change" next to the date to open the date picker (basic version)
+
+3.  Tap "Save & Continue" to save and return to the list
+
+4.  See the new checklist appear in the list with the information you entered
+
+5.  Tap "Cancel" to go back without saving
