@@ -52,9 +52,10 @@ fun NavGraph(
                     navController.popBackStack()
                 },
                 onSaveComplete = { checklistId ->
-                    // For Phase 3, navigate back to list
-                    // In Phase 4, we'll navigate to the checklist detail screen
+                    // Navigate to the checklist detail screen
+                    // Pop the NewChecklist screen from back stack so back button goes to list
                     navController.popBackStack()
+                    navController.navigate(Screen.ChecklistDetail.createRoute(checklistId))
                 }
             )
         }

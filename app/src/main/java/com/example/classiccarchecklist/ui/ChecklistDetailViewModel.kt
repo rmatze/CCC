@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.classiccarchecklist.data.CarChecklist
+import com.example.classiccarchecklist.data.ChecklistItemDomain
+import com.example.classiccarchecklist.data.ChecklistItemsDefinition
 import com.example.classiccarchecklist.data.ChecklistRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,8 +29,12 @@ class ChecklistDetailViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
     
+    private val _checklistItems = MutableStateFlow<List<ChecklistItemDomain>>(emptyList())
+    val checklistItems: StateFlow<List<ChecklistItemDomain>> = _checklistItems.asStateFlow()
+    
     init {
         loadChecklist()
+        loadChecklistItems()
     }
     
     private fun loadChecklist() {
@@ -59,6 +65,42 @@ class ChecklistDetailViewModel(
     fun updateVin(vin: String) {
         _checklist.value?.let { current ->
             _checklist.value = current.copy(vin = vin)
+        }
+    }
+    
+    private fun loadChecklistItems() {
+        viewModelScope.launch {
+            try {
+                val existingItems = repository.getItemsByChecklistIdSuspend(checklistId)
+                if (existingItems.isEmpty()) {
+                    // Initialize with default items if none exist
+                    val defaultItems = ChecklistItemsDefinition.getAllItems(checklistId)
+                    repository.insertItems(defaultItems, checklistId)
+                    _checklistItems.value = repository.getItemsByChecklistIdSuspend(checklistId)
+                } else {
+                    _checklistItems.value = existingItems
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to load checklist items"
+            }
+        }
+    }
+    
+    fun updateItemValue(itemId: Long, value: String?) {
+        viewModelScope.launch {
+            val updatedItems = _checklistItems.value.map { item ->
+                if (item.id == itemId) {
+                    item.copy(value = value)
+                } else {
+                    item
+                }
+            }
+            _checklistItems.value = updatedItems
+            
+            // Save to database
+            updatedItems.find { it.id == itemId }?.let { updatedItem ->
+                repository.updateItem(updatedItem, checklistId)
+            }
         }
     }
     

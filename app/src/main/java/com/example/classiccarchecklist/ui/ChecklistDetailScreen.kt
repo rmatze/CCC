@@ -31,6 +31,7 @@ fun ChecklistDetailScreen(
     )
     
     val checklist by viewModel.checklist.collectAsState()
+    val checklistItems by viewModel.checklistItems.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     
@@ -194,20 +195,23 @@ fun ChecklistDetailScreen(
                         enabled = isEditing
                     )
                     
-                    // Info text
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
+                    // Checklist Items
+                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    
+                    Text(
+                        text = "Inspection Checklist",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    
+                    ChecklistItemsView(
+                        items = checklistItems,
+                        onItemValueChanged = { itemId, value ->
+                            viewModel.updateItemValue(itemId, value)
+                        },
                         modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "Checklist items will be displayed here in Phase 4.",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(12.dp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    )
                 }
             }
         }

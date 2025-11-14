@@ -1,0 +1,152 @@
+package com.example.classiccarchecklist.ui
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.example.classiccarchecklist.data.ChecklistItemDomain
+import com.example.classiccarchecklist.data.ChecklistSection
+
+/**
+ * Composable that displays all checklist items grouped by section
+ * Uses Column for use within a scrollable parent
+ */
+@Composable
+fun ChecklistItemsView(
+    items: List<ChecklistItemDomain>,
+    onItemValueChanged: (Long, String?) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Group items by section
+    val itemsBySection = items.groupBy { it.section }
+    
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Display each section
+        ChecklistSection.values().forEach { section ->
+            val sectionItems = itemsBySection[section] ?: emptyList()
+            if (sectionItems.isNotEmpty()) {
+                SectionHeader(section = section)
+                
+                sectionItems.forEach { item ->
+                    ChecklistItemRow(
+                        item = item,
+                        onValueChanged = { value ->
+                            onItemValueChanged(item.id, value)
+                        }
+                    )
+                }
+                
+                // Add spacing after section
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+/**
+ * Section header composable following Material Design 3 guidelines
+ */
+@Composable
+fun SectionHeader(
+    section: ChecklistSection,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 1.dp
+    ) {
+        Text(
+            text = section.displayName,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        )
+    }
+}
+
+/**
+ * Individual checklist item row
+ * For Phase 4, this shows the question text
+ * Interactive widgets will be added in Phase 5-7
+ */
+@Composable
+fun ChecklistItemRow(
+    item: ChecklistItemDomain,
+    onValueChanged: (String?) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Question text
+            Text(
+                text = item.question,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            // Placeholder for item type indicator
+            // Will be replaced with actual widgets in Phase 5-7
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    Text(
+                        text = when (item.type) {
+                            com.example.classiccarchecklist.data.ChecklistItemType.YES_NO -> "YES/NO"
+                            com.example.classiccarchecklist.data.ChecklistItemType.MULTI_CHOICE -> "MULTI-CHOICE"
+                            com.example.classiccarchecklist.data.ChecklistItemType.TEXT_INPUT -> "TEXT INPUT"
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+                
+                if (item.options.isNotEmpty()) {
+                    Text(
+                        text = "Options: ${item.options.joinToString(", ")}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            // Show current value if set
+            item.value?.let { value ->
+                Text(
+                    text = "Current: $value",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+    }
+}
+
