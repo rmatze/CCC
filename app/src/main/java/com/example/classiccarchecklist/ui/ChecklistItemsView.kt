@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.classiccarchecklist.data.ChecklistItemDomain
@@ -75,11 +76,12 @@ fun SectionHeader(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = if (isComplete) {
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
         } else {
             MaterialTheme.colorScheme.surfaceVariant
         },
-        tonalElevation = 1.dp
+        tonalElevation = if (isComplete) 2.dp else 1.dp,
+        shape = MaterialTheme.shapes.small
     ) {
         Row(
             modifier = Modifier
@@ -105,11 +107,17 @@ fun SectionHeader(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (isComplete) {
-                        Text(
-                            text = "✓",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                        Surface(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = MaterialTheme.shapes.extraSmall
+                        ) {
+                            Text(
+                                text = "✓",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Color.Black,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                            )
+                        }
                     }
                     Text(
                         text = "$completedCount/$totalCount",
@@ -146,11 +154,12 @@ fun ChecklistItemRow(
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isCompleted) 2.dp else 1.dp
+            defaultElevation = if (isCompleted) 3.dp else 1.dp
         ),
         colors = CardDefaults.cardColors(
             containerColor = cardColor
-        )
+        ),
+        shape = MaterialTheme.shapes.medium
     ) {
         Column(
             modifier = Modifier

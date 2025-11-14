@@ -16,20 +16,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-// Custom dark color scheme matching the analytics dashboard
+// Modern dark color scheme with green accents (matching PodCaster style)
 private val DarkColorScheme = darkColorScheme(
-    primary = PurplePrimary,
-    onPrimary = WhiteText,
-    primaryContainer = PurplePrimaryDark,
+    primary = GreenPrimary,
+    onPrimary = Color.Black,
+    primaryContainer = GreenPrimaryDark,
     onPrimaryContainer = WhiteText,
     
-    secondary = PurplePrimaryLight,
-    onSecondary = WhiteText,
-    secondaryContainer = PurplePrimaryDark,
+    secondary = GreenAccent,
+    onSecondary = Color.Black,
+    secondaryContainer = GreenPrimaryDark,
     onSecondaryContainer = WhiteText,
     
-    tertiary = PurplePrimaryLight,
-    onTertiary = WhiteText,
+    tertiary = GreenPrimaryLight,
+    onTertiary = Color.Black,
     
     background = DarkBackground,
     onBackground = WhiteText,
@@ -44,18 +44,18 @@ private val DarkColorScheme = darkColorScheme(
     errorContainer = Color(0xFFB00020),
     onErrorContainer = WhiteText,
     
-    outline = Color(0xFF424242),
-    outlineVariant = Color(0xFF616161),
+    outline = Color(0xFF3A3A3A),
+    outlineVariant = Color(0xFF4A4A4A),
     
     inverseSurface = WhiteText,
     inverseOnSurface = DarkBackground,
-    inversePrimary = PurplePrimary
+    inversePrimary = GreenPrimary
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = GreenPrimary,
+    secondary = GreenPrimaryLight,
+    tertiary = GreenAccent
 )
 
 @Composable
