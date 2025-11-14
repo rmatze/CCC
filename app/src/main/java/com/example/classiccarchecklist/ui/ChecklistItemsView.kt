@@ -76,8 +76,7 @@ fun SectionHeader(
 
 /**
  * Individual checklist item row
- * For Phase 4, this shows the question text
- * Interactive widgets will be added in Phase 5-7
+ * Displays the question and appropriate widget based on item type
  */
 @Composable
 fun ChecklistItemRow(
@@ -85,66 +84,84 @@ fun ChecklistItemRow(
     onValueChanged: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isCompleted = item.value != null
+    val cardColor = if (isCompleted) {
+        MaterialTheme.colorScheme.surfaceVariant
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+    
     Card(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isCompleted) 2.dp else 1.dp
+        ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = cardColor
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Question text
             Text(
                 text = item.question,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = if (isCompleted) {
+                    androidx.compose.ui.text.font.FontWeight.Medium
+                } else {
+                    androidx.compose.ui.text.font.FontWeight.Normal
+                }
             )
             
-            // Placeholder for item type indicator
-            // Will be replaced with actual widgets in Phase 5-7
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = MaterialTheme.shapes.small
-                ) {
-                    Text(
-                        text = when (item.type) {
-                            com.example.classiccarchecklist.data.ChecklistItemType.YES_NO -> "YES/NO"
-                            com.example.classiccarchecklist.data.ChecklistItemType.MULTI_CHOICE -> "MULTI-CHOICE"
-                            com.example.classiccarchecklist.data.ChecklistItemType.TEXT_INPUT -> "TEXT INPUT"
-                        },
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            // Display appropriate widget based on item type
+            when (item.type) {
+                com.example.classiccarchecklist.data.ChecklistItemType.YES_NO -> {
+                    YesNoItemWidget(
+                        currentValue = item.value,
+                        onValueChanged = onValueChanged,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-                
-                if (item.options.isNotEmpty()) {
-                    Text(
-                        text = "Options: ${item.options.joinToString(", ")}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                com.example.classiccarchecklist.data.ChecklistItemType.MULTI_CHOICE -> {
+                    // Placeholder for Phase 6
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text(
+                            text = "MULTI-CHOICE (Phase 6)",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                    if (item.options.isNotEmpty()) {
+                        Text(
+                            text = "Options: ${item.options.joinToString(", ")}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
-            }
-            
-            // Show current value if set
-            item.value?.let { value ->
-                Text(
-                    text = "Current: $value",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
+                com.example.classiccarchecklist.data.ChecklistItemType.TEXT_INPUT -> {
+                    // Placeholder for Phase 7
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text(
+                            text = "TEXT INPUT (Phase 7)",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
             }
         }
     }

@@ -396,3 +396,114 @@ Phase 4 Summary: Checklist UI - Basic Structure
 2.  See item type indicators (YES/NO, MULTI-CHOICE, TEXT INPUT)
 
 3.  See options listed for multi-choice items
+
+
+Phase 5 Summary: Checklist Items - YES/NO Questions
+---------------------------------------------------
+
+### Completed components
+
+1.  YES/NO widget component:
+
+
+*   YesNoItemWidget — Material Design 3 radio buttons for YES/NO selection
+
+*   Two radio buttons: YES and NO
+
+*   Allows deselecting by clicking the selected option again
+
+*   Visual feedback with primary color for selected option
+
+
+2.  Visual feedback for completed items:
+
+
+*   Card background changes to surfaceVariant when answered
+
+*   Card elevation increases (2dp vs 1dp) when completed
+
+*   Question text uses medium font weight when answered
+
+*   "✓ Answered" badge appears below the selection
+
+*   Badge uses primary container color for visibility
+
+
+3.  State management:
+
+
+*   Values saved as "YES" or "NO" strings
+
+*   State persists to database automatically via ViewModel
+
+*   Updates happen in real time as user selects options
+
+
+4.  Integration:
+
+
+*   ChecklistItemRow updated to use YesNoItemWidget for YES\_NO type items
+
+*   Placeholders remain for MULTI\_CHOICE (Phase 6) and TEXT\_INPUT (Phase 7)
+
+*   All YES/NO items across all sections now have interactive widgets
+
+
+### Android best practices implemented
+
+*   Material Design 3 RadioButton components
+
+*   Proper state management with immediate persistence
+
+*   Visual accessibility with clear selection indicators
+
+*   Touch targets sized appropriately (radio buttons + text)
+
+*   Color contrast following Material Design guidelines
+
+*   Immediate visual feedback for user actions
+
+
+### Build status
+
+*   Project builds successfully
+
+*   No linting errors
+
+*   All YES/NO items are now interactive
+
+
+### What you can test now
+
+1.  Open any checklist (new or existing)
+
+2.  Scroll to any YES/NO question (most items in the checklist)
+
+3.  Tap YES or NO radio buttons to select
+
+4.  See visual feedback:
+
+
+*   Selected option highlighted in primary color
+
+*   Card background changes
+
+*   "✓ Answered" badge appears
+
+*   Question text becomes bold
+
+
+1.  Tap the selected option again to deselect
+
+2.  Navigate away and back — selections persist
+
+3.  Test across different sections (Paint & Body, Engine Bay, Interior, etc.)
+
+
+### Statistics
+
+*   Total YES/NO items: ~45 out of 58 total items
+
+*   All YES/NO items are now fully interactive
+
+*   State persists automatically to database
